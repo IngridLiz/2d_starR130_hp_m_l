@@ -2,7 +2,7 @@
 Solving reaction-diffusion metabolic model in a Circular domain 
 Reference Farina et al. DOI: https://doi.org/10.1101/2022.07.21.500921
 
-Circular domain of R70
+Circular domain of R130
 GLC influx subregion on the left, LAC outflux subregion on the right
 
 
@@ -28,10 +28,10 @@ import meshio
 
 # Control Setting
 
-x_center,y_center = 110.0, 110.0
+x_center,y_center = 130.0, 130.0
 
 L1=40.0
-L2=180.0
+L2=220.0
 
 ##center-1
 #x_hxk, y_hxk = x_center,y_center
@@ -84,7 +84,7 @@ num_step = 8000 # number of time step
 dt = T / num_step
 
 ## import mesh
-msh = meshio.read("starR110.msh")
+msh = meshio.read("starR130.msh")
 meshio.write("mesh.xml",msh)
 xml_file = Mesh("mesh.xml")
 mesh = Mesh(xml_file)
@@ -192,14 +192,14 @@ D_f = Constant(0.64E3)
 
 # Define the subdomain for GLC entrance
 radius_influx = 10.
-subdomain = Expression('(pow(x[0],2)+pow(x[1]-110,2)) < (r * r) ? 1. : 0', r=radius_influx, degree=1)
+subdomain = Expression('(pow(x[0],2)+pow(x[1]-130,2)) < (r * r) ? 1. : 0', r=radius_influx, degree=1)
 subdomain_area = assemble(subdomain * dx(mesh))
 
 # Define influx of GLC in a subdomain of the circle
 
 influx =  0.048 * area /subdomain_area
 print('influx', influx)
-f_1 = Expression('(pow(x[0],2)+pow(x[1]-110,2)) < (r * r) ? influx : 0', influx=influx, r=radius_influx, degree=1)
+f_1 = Expression('(pow(x[0],2)+pow(x[1]-130,2)) < (r * r) ? influx : 0', influx=influx, r=radius_influx, degree=1)
 
 
 # Degradation of LAC
@@ -210,12 +210,12 @@ dx = dx(metadata={'quadrature_degree': q_degree})
 # Define the subdomain for LAC exit
 
 radius_outflux = 10.
-subdomain_outflux = Expression('(pow(x[0]- 220,2)+pow(x[1]- 110,2)) < (r * r) ? 1. : 0', r=radius_outflux, degree=1)
+subdomain_outflux = Expression('(pow(x[0]- 260,2)+pow(x[1]- 130,2)) < (r * r) ? 1. : 0', r=radius_outflux, degree=1)
 subdomain_outflux_area = assemble(subdomain_outflux * dx(mesh))
 
 outflux = 0.0969 * area / subdomain_outflux_area
 
-eta_f = Expression('(pow(x[0] - 220,2)+pow(x[1]- 110.,2)) < (r * r) ? outflux : 0', outflux = outflux, r=radius_outflux, degree=1)
+eta_f = Expression('(pow(x[0] - 260,2)+pow(x[1]- 130.,2)) < (r * r) ? outflux : 0', outflux = outflux, r=radius_outflux, degree=1)
 
 
 # Weak form
@@ -298,12 +298,12 @@ for n in range(num_step):
     #if n in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,100,200,400,600,800,1000]:
         
         #Create VTK files for visualization output
-        vtkfile_glc = File('results_2c_starR110_hp_m_l/glc/glc_starR110_hp_m_l_%sof8000.pvd' % n)
-        vtkfile_atp = File('results_2c_starR110_hp_m_l/atp/atp_starR110_hp_m_l_%sof8000.pvd' % n)
-        vtkfile_adp = File('results_2c_starR110_hp_m_l/adp/adp_starR110_hp_m_l_%sof8000.pvd' % n)
-        vtkfile_gly = File('results_2c_starR110_hp_m_l/gly/gly_starR110_hp_m_l_%sof8000.pvd' % n)
-        vtkfile_pyr = File('results_2c_starR110_hp_m_l/pyr/pyr_starR110_hp_m_l_%sof8000.pvd' % n)
-        vtkfile_lac = File('results_2c_starR110_hp_m_l/lac/lac_starR110_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_glc = File('results_2d_starR130_hp_m_l/glc/glc_starR130_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_atp = File('results_2d_starR130_hp_m_l/atp/atp_starR130_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_adp = File('results_2d_starR130_hp_m_l/adp/adp_starR130_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_gly = File('results_2d_starR130_hp_m_l/gly/gly_starR130_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_pyr = File('results_2d_starR130_hp_m_l/pyr/pyr_starR130_hp_m_l_%sof8000.pvd' % n)
+        vtkfile_lac = File('results_2d_starR130_hp_m_l/lac/lac_starR130_hp_m_l_%sof8000.pvd' % n)
         
         vtkfile_glc << (_a, t[0])
         vtkfile_atp << (_b, t[0])
@@ -327,4 +327,4 @@ tottime = aftersolve-startime
 print('final time', tottime)
 #print(list_of_list)
 
-np.save('./output_2c_starR110_hp_m_l', np.asarray(list_of_list))
+np.save('./output_2d_starR130_hp_m_l', np.asarray(list_of_list))
